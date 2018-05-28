@@ -10,11 +10,11 @@ public class Expenditure {
     private String description;
     private String type;
     private double spent;
-    private char currency;
+    private String currency;
 
     public Expenditure() { }
 
-    public Expenditure(long id, String date, String description, String type, double spent, char currency) {
+    public Expenditure(long id, String date, String description, String type, double spent, String currency) {
         this.id = id;
         this.date = date;
         this.description = description;
@@ -63,11 +63,11 @@ public class Expenditure {
         this.spent = spent;
     }
 
-    public char getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(char currency) {
+    public void setCurrency(String currency) {
         this.currency = currency;
     }
 }
