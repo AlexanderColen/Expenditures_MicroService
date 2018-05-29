@@ -11,6 +11,7 @@ public class Expenditure {
     private String type;
     private double spent;
     private String currency;
+    private long debtID;
 
     public Expenditure() { }
 
@@ -69,5 +70,13 @@ public class Expenditure {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public long getDebtID() {
+        return debtID;
+    }
+
+    public void setDebtID(long debtID) {
+        this.debtID = debtID;
     }
 }
