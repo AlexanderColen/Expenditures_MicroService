@@ -1,10 +1,19 @@
 package com.fontys.capitaselecta.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  *
  * @author Alex
  */
+@Entity
 public class Expenditure {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String date;
     private String description;
@@ -15,8 +24,7 @@ public class Expenditure {
 
     public Expenditure() { }
 
-    public Expenditure(long id, String date, String description, String type, double spent, String currency) {
-        this.id = id;
+    public Expenditure(String date, String description, String type, double spent, String currency) {
         this.date = date;
         this.description = description;
         this.type = type;

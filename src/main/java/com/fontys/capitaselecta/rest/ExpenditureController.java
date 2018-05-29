@@ -1,13 +1,14 @@
 package com.fontys.capitaselecta.rest;
 
 import com.fontys.capitaselecta.domain.Expenditure;
+import com.fontys.capitaselecta.service.ExpenditureService;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,45 +24,35 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/expenditures")
 public class ExpenditureController {
-
+    
     private static final Logger LOG = Logger.getLogger(ExpenditureController.class.getName());
     
-    private List<Expenditure> expenditures;
-    private AtomicInteger counter = new AtomicInteger(1);
+    @Autowired
+    private ExpenditureService expenditureService;
 
-    public ExpenditureController() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
-        String date = dateFormatter.format(new Date());
-        
-        this.expenditures = new ArrayList<>();
-        
-        expenditures.add(new Expenditure(counter.getAndIncrement(), date, "Coffee + Biscuit", "FOOD", 13.37, "CAD"));
-        expenditures.add(new Expenditure(counter.getAndIncrement(), date, "Sweater", "CLOTHES", 69.69, "CAD"));
-        expenditures.add(new Expenditure(counter.getAndIncrement(), date, "Rent for June", "RENT", 555.55, "CAD")); 
-    }     
+//    @PostConstruct
+//    public void init() {
+//        LOG.log(Level.INFO, "Creating fake data...");
+//        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+//        String date = dateFormatter.format(new Date());
+//        
+//        this.expenditureService.postExpenditure(new Expenditure(date, "Coffee + Biscuit", "FOOD", 13.37, "CAD"));
+//        this.expenditureService.postExpenditure(new Expenditure(date, "Sweater", "CLOTHES", 69.69, "CAD"));
+//        this.expenditureService.postExpenditure(new Expenditure(date, "Rent for June", "RENT", 555.55, "CAD"));
+//    }     
     
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Expenditure fetchSpecificExpenditure(@PathVariable("id") long id) {
         LOG.log(Level.INFO, "Fetch Specific Expenditure.");
         
-        Expenditure found = null;
-        
-        for (Expenditure e : this.expenditures) {
-            if (e.getId() == id) {
-                found = e;
-                break;
-            }
-        }
-        
-        return found;
+        return this.getExpenditureService().getSpecificExpenditure(id);
     }
     
     @RequestMapping(method = RequestMethod.GET)
     public List<Expenditure> getAllExpenditures() {
-        //TODO DATABASE THIS SHIT.
         LOG.log(Level.INFO, "Fetch All Expenditures.");
         
-        return this.expenditures;
+        return this.getExpenditureService().getAllExpenditures();
     }
     
     @RequestMapping(value = "/new", method = RequestMethod.POST)
@@ -70,12 +61,29 @@ public class ExpenditureController {
                                         @RequestParam("spent") double spent,
                                         @RequestParam("type") String type,
                                         @RequestParam("currency") String currency) {
-        //TODO POST IN DATABASE.
         LOG.log(Level.INFO, "Post New Expenditure.");
         
-        Expenditure expenditure = new Expenditure(counter.getAndIncrement(), date, description, type, spent, currency);
-        this.expenditures.add(expenditure);
+        Expenditure expenditure = new Expenditure(date, description, type, spent, currency);
         
-        return expenditure;
+        if (this.getExpenditureService().postExpenditure(expenditure)) {
+            return expenditure;
+        } else {
+            return null;
+        }
+    }
+    
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public boolean removeExpenditure(@RequestParam("id") long id) {
+        LOG.log(Level.INFO, String.format("Deleting Expenditure with ID %s", id));
+        
+        return this.getExpenditureService().deleteExpenditure(id);
+    }
+    
+    private ExpenditureService getExpenditureService() {
+        if (this.expenditureService == null) {
+            this.expenditureService = new ExpenditureService();
+        }
+        
+        return this.expenditureService;
     }
 }

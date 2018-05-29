@@ -1,7 +1,6 @@
-com\fontys\capitaselecta\dao\IExpenditureDAO.class
 main\Application.class
+com\fontys\capitaselecta\dao\ExpenditureDAO.class
 com\fontys\capitaselecta\domain\Expenditure.class
-com\fontys\capitaselecta\security\WebSecurityConfig.class
+main\AppConfig.class
 com\fontys\capitaselecta\rest\ExpenditureController.class
-.netbeans_automatic_build
-com\fontys\capitaselecta\dao\ExpenditureDAOImpl.class
+com\fontys\capitaselecta\service\ExpenditureService.class
