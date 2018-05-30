@@ -11,7 +11,7 @@
     <logger name="org.springframework.jdbc" level="error" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="com.michaelcgood" level="error" additivity="false">
+    <logger name="com.alexandercolen" level="error" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
     <root level="error">

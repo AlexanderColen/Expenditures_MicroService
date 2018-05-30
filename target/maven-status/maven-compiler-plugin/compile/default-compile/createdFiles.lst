@@ -1,6 +1,6 @@
-main\Application.class
-com\fontys\capitaselecta\dao\ExpenditureDAO.class
-com\fontys\capitaselecta\domain\Expenditure.class
-main\AppConfig.class
-com\fontys\capitaselecta\rest\ExpenditureController.class
-com\fontys\capitaselecta\service\ExpenditureService.class
+com\alexandercolen\rest\ExpenditureController.class
+com\alexandercolen\AppConfig.class
+com\alexandercolen\ExpenditureApplication.class
+com\alexandercolen\service\ExpenditureService.class
+com\alexandercolen\domain\Expenditure.class
+com\alexandercolen\dao\ExpenditureDAO.class
