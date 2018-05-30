@@ -2,12 +2,9 @@ package com.fontys.capitaselecta.rest;
 
 import com.fontys.capitaselecta.domain.Expenditure;
 import com.fontys.capitaselecta.service.ExpenditureService;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;

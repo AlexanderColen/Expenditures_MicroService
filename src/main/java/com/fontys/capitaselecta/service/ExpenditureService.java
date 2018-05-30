@@ -8,6 +8,14 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.fontys.capitaselecta.dao.ExpenditureDAO;
+import java.io.IOException;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,6 +26,8 @@ import org.springframework.stereotype.Service;
 public class ExpenditureService {
 
     private static final Logger LOG = Logger.getLogger(ExpenditureService.class.getName());
+    
+    private static final String URL = "http://localhost:8080/debts/id/payment";
         
     @Autowired
     DataSource dataSource;
@@ -44,13 +54,35 @@ public class ExpenditureService {
     }
 
     public boolean postExpenditure(Expenditure expenditure) {
-        if (this.expenditureDAO == null) {
-            return false;
+        try {
+            if (this.expenditureDAO == null) {
+                return false;
+            }
+            
+            this.expenditureDAO.save(expenditure);
+            
+            //Create HTTP request for posting in Debt microservice.
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpPost postRequest = new HttpPost(this.URL);
+            
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("debtID", String.format("%s", expenditure.getDebtID())));
+            postRequest.setEntity(new UrlEncodedFormEntity(params));
+            
+            //Execute request.
+            HttpResponse response = httpClient.execute(postRequest);
+            
+            if (response.getStatusLine().getStatusCode() != 200) {
+                LOG.log(Level.INFO, String.format("Failed : HTTP error code : %s", response.getStatusLine().getStatusCode()));
+                return false;
+            }
+            
+            return true;
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
         
-        this.expenditureDAO.save(expenditure);
-        
-        return true;
+        return false;
     }
 
     public Expenditure getSpecificExpenditure(long id) {
