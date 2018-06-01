@@ -52,18 +52,19 @@ public class ExpenditureController {
         return this.getExpenditureService().getAllExpenditures();
     }
     
-    @RequestMapping(value = "/new", method = RequestMethod.POST)
+    @RequestMapping(value = "/new/{external}", method = RequestMethod.POST)
     public Expenditure postExpenditure(@RequestParam("description") String description,
                                         @RequestParam("date") String date,
                                         @RequestParam("spent") double spent,
                                         @RequestParam("type") String type,
                                         @RequestParam("currency") String currency,
-                                        @RequestParam("debtID") long debtID) {
+                                        @RequestParam("debtID") long debtID,
+                                        @PathVariable("external") String external) {
         LOG.log(Level.INFO, "Post New Expenditure.");
         
         Expenditure expenditure = new Expenditure(date, description, type, spent, currency, debtID);
         
-        if (this.getExpenditureService().postExpenditure(expenditure)) {
+        if (this.getExpenditureService().postExpenditure(expenditure, external)) {
             return expenditure;
         } else {
             return null;

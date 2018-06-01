@@ -1,6 +1,0 @@
-com\alexandercolen\rest\ExpenditureController.class
-com\alexandercolen\AppConfig.class
-com\alexandercolen\ExpenditureApplication.class
-com\alexandercolen\service\ExpenditureService.class
-com\alexandercolen\domain\Expenditure.class
-com\alexandercolen\dao\ExpenditureDAO.class

@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.alexandercolen.dao.ExpenditureDAO;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -29,7 +28,7 @@ public class ExpenditureService {
 
     private static final Logger LOG = Logger.getLogger(ExpenditureService.class.getName());
     
-    private static final String URL = "http://localhost:8091/debts/";
+    private static final String DEBTS_URL = "http://localhost:8091/debts/";
         
     @Autowired
     DataSource dataSource;
@@ -56,17 +55,18 @@ public class ExpenditureService {
         return expenditures;
     }
 
-    public boolean postExpenditure(Expenditure expenditure) {
+    public boolean postExpenditure(Expenditure expenditure, String external) {
         try {
             if (this.expenditureDAO == null) {
                 return false;
             }
             
-            if (expenditure.getDebtID() != 0) {
+            if (expenditure.getDebtID() != 0 && external.equalsIgnoreCase("yes")) {
                 //Create HTTP request for posting payment in Debt microservice.
                 HttpClient httpClient = HttpClientBuilder.create().build();
 
-                String postURL = String.format(this.URL + "%s/payments/new", expenditure.getDebtID());
+                String postURL = String.format(ExpenditureService.DEBTS_URL + "%s/payments/new/no", expenditure.getDebtID());
+                LOG.log(Level.INFO, String.format("Trying to post at URL: %s", postURL));
 
                 HttpPost postRequest = new HttpPost(postURL);
 
@@ -86,8 +86,8 @@ public class ExpenditureService {
             }
             
             this.expenditureDAO.save(expenditure);
-            
-            return true;
+        
+        return true;
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -115,6 +115,8 @@ public class ExpenditureService {
         Expenditure expenditure = this.expenditureDAO.findById(id).get();
         
         if (expenditure.getDebtID() != 0) {
+            //TODO find a way to make deleting a payment work without knowing what payment it is exactly.
+            
 //            try {
 //                //Create HTTP request for deleting payment in Debt microservice.
 //                HttpClient httpClient = HttpClientBuilder.create().build();
@@ -124,9 +126,7 @@ public class ExpenditureService {
 //                HttpPost postRequest = new HttpPost(postURL);
 //                
 //                List<NameValuePair> params = new ArrayList<>();
-//                params.add(new BasicNameValuePair("date", String.format("%s", expenditure.getDate())));
-//                params.add(new BasicNameValuePair("spent", String.format("%s", expenditure.getSpent())));
-//                params.add(new BasicNameValuePair("currency", String.format("%s", expenditure.getCurrency())));
+//                params.add(new BasicNameValuePair("date", String.format("%s", expenditure.getId())));
 //                postRequest.setEntity(new UrlEncodedFormEntity(params));
 //                
 //                //Execute request.
@@ -136,8 +136,6 @@ public class ExpenditureService {
 //                    LOG.log(Level.INFO, String.format("Failed : HTTP error code : %s", response.getStatusLine().getStatusCode()));
 //                    return false;
 //                }
-//            } catch (UnsupportedEncodingException ex) {
-//                LOG.log(Level.SEVERE, ex.getMessage(), ex);
 //            } catch (IOException ex) {
 //                LOG.log(Level.SEVERE, ex.getMessage(), ex);
 //            }
