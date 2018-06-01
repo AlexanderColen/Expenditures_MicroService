@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Alex
  */
-@CrossOrigin(origins = "http://localhost:4200", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS })
+@CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8091"}, methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS })
 @RestController
 @RequestMapping(value = "/expenditures")
 public class ExpenditureController {
@@ -57,10 +57,11 @@ public class ExpenditureController {
                                         @RequestParam("date") String date,
                                         @RequestParam("spent") double spent,
                                         @RequestParam("type") String type,
-                                        @RequestParam("currency") String currency) {
+                                        @RequestParam("currency") String currency,
+                                        @RequestParam("debtID") long debtID) {
         LOG.log(Level.INFO, "Post New Expenditure.");
         
-        Expenditure expenditure = new Expenditure(date, description, type, spent, currency);
+        Expenditure expenditure = new Expenditure(date, description, type, spent, currency, debtID);
         
         if (this.getExpenditureService().postExpenditure(expenditure)) {
             return expenditure;

@@ -27,7 +27,7 @@ public class ExpenditureService {
 
     private static final Logger LOG = Logger.getLogger(ExpenditureService.class.getName());
     
-    private static final String URL = "http://localhost:8080/debts/";
+    private static final String URL = "http://localhost:8091/debts/";
         
     @Autowired
     DataSource dataSource;
@@ -60,23 +60,27 @@ public class ExpenditureService {
             
             this.expenditureDAO.save(expenditure);
             
-            //Create HTTP request for posting in Debt microservice.
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            
-            String postURL = String.format(this.URL + "%s/payment", expenditure.getDebtID());
-            
-            HttpPost postRequest = new HttpPost(postURL);
-            
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("debtID", String.format("%s", expenditure.getDebtID())));
-            postRequest.setEntity(new UrlEncodedFormEntity(params));
-            
-            //Execute request.
-            HttpResponse response = httpClient.execute(postRequest);
-            
-            if (response.getStatusLine().getStatusCode() != 200) {
-                LOG.log(Level.INFO, String.format("Failed : HTTP error code : %s", response.getStatusLine().getStatusCode()));
-                return false;
+            if (expenditure.getDebtID() != 0) {
+                //Create HTTP request for posting in Debt microservice.
+                HttpClient httpClient = HttpClientBuilder.create().build();
+
+                String postURL = String.format(this.URL + "%s/payments/new", expenditure.getDebtID());
+
+                HttpPost postRequest = new HttpPost(postURL);
+
+                List<NameValuePair> params = new ArrayList<>();
+                params.add(new BasicNameValuePair("date", String.format("%s", expenditure.getDate())));
+                params.add(new BasicNameValuePair("spent", String.format("%s", expenditure.getSpent())));
+                params.add(new BasicNameValuePair("currency", String.format("%s", expenditure.getCurrency())));
+                postRequest.setEntity(new UrlEncodedFormEntity(params));
+
+                //Execute request.
+                HttpResponse response = httpClient.execute(postRequest);
+
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    LOG.log(Level.INFO, String.format("Failed : HTTP error code : %s", response.getStatusLine().getStatusCode()));
+                    return false;
+                }
             }
             
             return true;

@@ -24,12 +24,13 @@ public class Expenditure {
 
     public Expenditure() { }
 
-    public Expenditure(String date, String description, String type, double spent, String currency) {
+    public Expenditure(String date, String description, String type, double spent, String currency, long debtID) {
         this.date = date;
         this.description = description;
         this.type = type;
         this.spent = spent;
         this.currency = currency;
+        this.debtID = debtID;
     }
 
     public long getId() {
