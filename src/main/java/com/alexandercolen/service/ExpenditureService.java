@@ -9,6 +9,8 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.alexandercolen.dao.ExpenditureDAO;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Comparator;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -49,6 +51,8 @@ public class ExpenditureService {
             LOG.log(Level.INFO, "Autowired fail.");
         }
         
+        expenditures.sort(Comparator.comparing(Expenditure::getId));
+        
         return expenditures;
     }
 
@@ -58,10 +62,8 @@ public class ExpenditureService {
                 return false;
             }
             
-            this.expenditureDAO.save(expenditure);
-            
             if (expenditure.getDebtID() != 0) {
-                //Create HTTP request for posting in Debt microservice.
+                //Create HTTP request for posting payment in Debt microservice.
                 HttpClient httpClient = HttpClientBuilder.create().build();
 
                 String postURL = String.format(this.URL + "%s/payments/new", expenditure.getDebtID());
@@ -82,6 +84,8 @@ public class ExpenditureService {
                     return false;
                 }
             }
+            
+            this.expenditureDAO.save(expenditure);
             
             return true;
         } catch (IOException ex) {
@@ -108,7 +112,38 @@ public class ExpenditureService {
             return false;
         }
         
-        this.expenditureDAO.delete(this.expenditureDAO.findById(id).get());
+        Expenditure expenditure = this.expenditureDAO.findById(id).get();
+        
+        if (expenditure.getDebtID() != 0) {
+//            try {
+//                //Create HTTP request for deleting payment in Debt microservice.
+//                HttpClient httpClient = HttpClientBuilder.create().build();
+//                
+//                String postURL = String.format(this.URL + "%s/payments/new", expenditure.getDebtID());
+//                
+//                HttpPost postRequest = new HttpPost(postURL);
+//                
+//                List<NameValuePair> params = new ArrayList<>();
+//                params.add(new BasicNameValuePair("date", String.format("%s", expenditure.getDate())));
+//                params.add(new BasicNameValuePair("spent", String.format("%s", expenditure.getSpent())));
+//                params.add(new BasicNameValuePair("currency", String.format("%s", expenditure.getCurrency())));
+//                postRequest.setEntity(new UrlEncodedFormEntity(params));
+//                
+//                //Execute request.
+//                HttpResponse response = httpClient.execute(postRequest);
+//                
+//                if (response.getStatusLine().getStatusCode() != 200) {
+//                    LOG.log(Level.INFO, String.format("Failed : HTTP error code : %s", response.getStatusLine().getStatusCode()));
+//                    return false;
+//                }
+//            } catch (UnsupportedEncodingException ex) {
+//                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+//            } catch (IOException ex) {
+//                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+//            }
+        }
+        
+        this.expenditureDAO.delete(expenditure);
         
         return true;
     }
